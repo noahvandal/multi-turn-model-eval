@@ -1,0 +1,206 @@
+{
+  "updated": "2026-02-17",
+  "benchmark": "aiwf_medium_context",
+  "models": [
+    {
+      "model": "gpt-5.1",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 300, "tool_use_total": 300,
+      "instruction_pass": 300, "instruction_total": 300,
+      "kb_ground_pass": 300, "kb_ground_total": 300,
+      "pass_rate": 100.0, "median_rate": 100.0,
+      "ttfb_med": 916, "ttfb_p95": 2011, "ttfb_max": 5216
+    },
+    {
+      "model": "gemini-3-flash-preview",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 300, "tool_use_total": 300,
+      "instruction_pass": 300, "instruction_total": 300,
+      "kb_ground_pass": 300, "kb_ground_total": 300,
+      "pass_rate": 100.0, "median_rate": 100.0,
+      "ttfb_med": 1193, "ttfb_p95": 1635, "ttfb_max": 6653
+    },
+    {
+      "model": "claude-sonnet-4-5",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 300, "tool_use_total": 300,
+      "instruction_pass": 300, "instruction_total": 300,
+      "kb_ground_pass": 300, "kb_ground_total": 300,
+      "pass_rate": 100.0, "median_rate": 100.0,
+      "ttfb_med": 2234, "ttfb_p95": 3062, "ttfb_max": 5438
+    },
+    {
+      "model": "gpt-4.1",
+      "type": "text",
+      "notes": "gpt-4.1 and gemini-2.5-flash are used for most production voice agents because they currently offer the best balance of overall intelligence and low TTFB.",
+      "tool_use_pass": 283, "tool_use_total": 300,
+      "instruction_pass": 273, "instruction_total": 300,
+      "kb_ground_pass": 298, "kb_ground_total": 300,
+      "pass_rate": 94.9, "median_rate": 97.8,
+      "ttfb_med": 683, "ttfb_p95": 1052, "ttfb_max": 3860
+    },
+    {
+      "model": "gemini-2.5-flash",
+      "type": "text",
+      "notes": "gpt-4.1 and gemini-2.5-flash are used for most production voice agents because they currently offer the best balance of overall intelligence and low TTFB.",
+      "tool_use_pass": 275, "tool_use_total": 300,
+      "instruction_pass": 268, "instruction_total": 300,
+      "kb_ground_pass": 300, "kb_ground_total": 300,
+      "pass_rate": 93.7, "median_rate": 94.4,
+      "ttfb_med": 594, "ttfb_p95": 1349, "ttfb_max": 2104
+    },
+    {
+      "model": "kimi-k2-instruct-0905",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 272, "tool_use_total": 300,
+      "instruction_pass": 265, "instruction_total": 300,
+      "kb_ground_pass": 298, "kb_ground_total": 300,
+      "pass_rate": 92.8, "median_rate": 93.3,
+      "ttfb_med": 257, "ttfb_p95": 518, "ttfb_max": 1109
+    },
+    {
+      "model": "nova-2-pro-preview",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 288, "tool_use_total": 300,
+      "instruction_pass": 278, "instruction_total": 300,
+      "kb_ground_pass": 289, "kb_ground_total": 300,
+      "pass_rate": 92.7, "median_rate": 93.3,
+      "ttfb_med": 686, "ttfb_p95": 750, "ttfb_max": 1459
+    },
+    {
+      "model": "gpt-5-mini",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 271, "tool_use_total": 300,
+      "instruction_pass": 272, "instruction_total": 300,
+      "kb_ground_pass": 289, "kb_ground_total": 300,
+      "pass_rate": 92.4, "median_rate": 95.6,
+      "ttfb_med": 6339, "ttfb_p95": 17845, "ttfb_max": 27028
+    },
+    {
+      "model": "gpt-4o-mini",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 271, "tool_use_total": 300,
+      "instruction_pass": 262, "instruction_total": 300,
+      "kb_ground_pass": 293, "kb_ground_total": 300,
+      "pass_rate": 91.8, "median_rate": 92.2,
+      "ttfb_med": 760, "ttfb_p95": 1322, "ttfb_max": 3256
+    },
+    {
+      "model": "gpt-4o",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 278, "tool_use_total": 300,
+      "instruction_pass": 249, "instruction_total": 300,
+      "kb_ground_pass": 294, "kb_ground_total": 300,
+      "pass_rate": 91.2, "median_rate": 95.6,
+      "ttfb_med": 625, "ttfb_p95": 1222, "ttfb_max": 13378
+    },
+    {
+      "model": "nemotron-3-nano-30b-a3b",
+      "type": "text",
+      "notes": "Running in-cluster on NVIDIA Blackwell hardware.",
+      "tool_use_pass": 282, "tool_use_total": 300,
+      "instruction_pass": null, "instruction_total": null,
+      "kb_ground_pass": 293, "kb_ground_total": 300,
+      "pass_rate": 91.0, "median_rate": 93.3,
+      "ttfb_med": 171, "ttfb_p95": 199, "ttfb_max": 255
+    },
+    {
+      "model": "gpt-oss-120b (groq)",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 272, "tool_use_total": 300,
+      "instruction_pass": 270, "instruction_total": 300,
+      "kb_ground_pass": 298, "kb_ground_total": 300,
+      "pass_rate": 89.3, "median_rate": 90.0,
+      "ttfb_med": 98, "ttfb_p95": 226, "ttfb_max": 2117
+    },
+    {
+      "model": "gpt-5.2",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 224, "tool_use_total": 300,
+      "instruction_pass": 228, "instruction_total": 300,
+      "kb_ground_pass": 250, "kb_ground_total": 300,
+      "pass_rate": 78.0, "median_rate": 92.2,
+      "ttfb_med": 819, "ttfb_p95": 1483, "ttfb_max": 1825
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "type": "text",
+      "notes": "",
+      "tool_use_pass": 221, "tool_use_total": 300,
+      "instruction_pass": 172, "instruction_total": 300,
+      "kb_ground_pass": 299, "kb_ground_total": 300,
+      "pass_rate": 76.9, "median_rate": 75.6,
+      "ttfb_med": 732, "ttfb_p95": 1334, "ttfb_max": 4654
+    },
+    {
+      "model": "ultravox-v0.7",
+      "type": "speech",
+      "notes": "",
+      "tool_use_pass": 293, "tool_use_total": 300,
+      "instruction_pass": 294, "instruction_total": 300,
+      "kb_ground_pass": 298, "kb_ground_total": 300,
+      "turn_ok_pass": 300, "turn_ok_total": 300,
+      "pass_rate": 97.7,
+      "v2v_non_tool_med": 864, "v2v_non_tool_max": 1888,
+      "tool_v2v_mean": 2406, "silence_pad_mean": 82
+    },
+    {
+      "model": "gpt-realtime",
+      "type": "speech",
+      "notes": "",
+      "tool_use_pass": 271, "tool_use_total": 300,
+      "instruction_pass": 260, "instruction_total": 300,
+      "kb_ground_pass": 300, "kb_ground_total": 300,
+      "turn_ok_pass": 296, "turn_ok_total": 300,
+      "pass_rate": 86.7,
+      "v2v_non_tool_med": 1536, "v2v_non_tool_max": 4672,
+      "tool_v2v_mean": 2199, "silence_pad_mean": 341
+    },
+    {
+      "model": "gemini-live",
+      "type": "speech",
+      "notes": "",
+      "tool_use_pass": 258, "tool_use_total": 300,
+      "instruction_pass": 261, "instruction_total": 300,
+      "kb_ground_pass": 293, "kb_ground_total": 300,
+      "turn_ok_pass": 278, "turn_ok_total": 300,
+      "pass_rate": 86.0,
+      "v2v_non_tool_med": 2624, "v2v_non_tool_max": 30000,
+      "tool_v2v_mean": 4082, "silence_pad_mean": 90
+    },
+    {
+      "model": "nova-2-sonic",
+      "type": "speech",
+      "notes": "High rate of safety refusals for normal content and a connection limit of 8 minutes. Fixes in flight from AWS.",
+      "tool_use_pass": 278, "tool_use_total": 300,
+      "instruction_pass": 265, "instruction_total": 300,
+      "kb_ground_pass": 296, "kb_ground_total": 300,
+      "turn_ok_pass": null, "turn_ok_total": null,
+      "pass_rate": null,
+      "v2v_non_tool_med": 1280, "v2v_non_tool_max": 3232,
+      "tool_v2v_mean": 1689, "silence_pad_mean": 79
+    },
+    {
+      "model": "grok-realtime",
+      "type": "speech",
+      "notes": "The Grok API is currently not production ready. Grok often enters into an unrecoverable state during a session.",
+      "tool_use_pass": 267, "tool_use_total": 300,
+      "instruction_pass": 275, "instruction_total": 300,
+      "kb_ground_pass": 295, "kb_ground_total": 300,
+      "turn_ok_pass": null, "turn_ok_total": null,
+      "pass_rate": null,
+      "v2v_non_tool_med": 1184, "v2v_non_tool_max": 2016,
+      "tool_v2v_mean": 1472, "silence_pad_mean": 478
+    }
+  ]
+}

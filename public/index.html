@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Turn Model Eval · Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --bg-2: #1a1a1a;
+      --bg-3: #242424;
+      --border: #2e2e2e;
+      --text: #e8e8e8;
+      --text-dim: #666;
+      --text-muted: #999;
+      --accent: #7c9ef5;
+      --accent-dim: #3a4f8a;
+      --green: #5aad7a;
+      --yellow: #c9a84c;
+      --pill-active-bg: #e8e8e8;
+      --pill-active-text: #0f0f0f;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    header { margin-bottom: 36px; }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle span { color: var(--text-muted); }
+
+    /* Toggle pills */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+      letter-spacing: 0.01em;
+    }
+
+    .pill:hover { border-color: #555; color: var(--text); }
+
+    .pill.active {
+      background: var(--pill-active-bg);
+      border-color: var(--pill-active-bg);
+      color: var(--pill-active-text);
+    }
+
+    /* Threshold filter bar */
+    .threshold-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 18px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .threshold-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 14px;
+    }
+
+    .threshold-sep {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .threshold-field {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .threshold-field label {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      user-select: none;
+    }
+
+    .threshold-field input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 3px 7px;
+      width: 68px;
+      text-align: right;
+      transition: border-color 0.1s;
+      -moz-appearance: textfield;
+    }
+
+    .threshold-field input::-webkit-outer-spin-button,
+    .threshold-field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .threshold-field input:focus {
+      outline: none;
+      border-color: var(--accent-dim);
+    }
+
+    .threshold-field input.active {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .threshold-unit {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .threshold-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .threshold-count {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .threshold-count span { color: var(--text-muted); }
+
+    .threshold-clear {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: color 0.1s, border-color 0.1s;
+    }
+
+    .threshold-clear:hover { color: var(--text); border-color: #555; }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+
+    thead tr { background: var(--bg-2); }
+
+    th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover { color: var(--text); }
+    th.sorted { color: var(--accent); }
+
+    th .sort-arrow {
+      display: inline-block;
+      margin-left: 4px;
+      opacity: 0.5;
+    }
+
+    th.sorted .sort-arrow { opacity: 1; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.08s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg-2); }
+
+    td { padding: 11px 16px; white-space: nowrap; }
+
+    .col-model { color: var(--text); font-weight: 500; }
+
+    .col-type {
+      color: var(--text-muted);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge-text  { background: #1e2a3a; color: #7cb3f5; border: 1px solid #2a3f5f; }
+    .badge-speech { background: #1e3326; color: #5aad7a; border: 1px solid #2a5040; }
+
+    .col-num {
+      color: var(--text);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .col-pass {
+      color: var(--text-muted);
+      text-align: right;
+      font-size: 12px;
+    }
+
+    .pass-rate { font-weight: 600; }
+    .pass-rate.high { color: var(--green); }
+    .pass-rate.mid  { color: var(--yellow); }
+    .pass-rate.low  { color: #c0392b; }
+
+    .fraction { color: var(--text-dim); font-size: 11px; }
+    .em-dash  { color: var(--border); }
+
+    /* Footer */
+    .meta {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .meta-info { font-size: 11px; color: var(--text-dim); }
+    .meta-info span { color: var(--text-muted); }
+
+    .footnotes { font-size: 11px; color: var(--text-dim); line-height: 1.8; }
+    .footnote-sym { color: var(--text-muted); margin-right: 4px; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="title">Multi-Turn Model Eval &mdash; Leaderboard</div>
+    <div class="subtitle" id="meta-line">loading&hellip;</div>
+  </header>
+
+  <div class="filter-bar">
+    <button class="pill active" data-filter="all">All</button>
+    <button class="pill" data-filter="text">Text Mode</button>
+    <button class="pill" data-filter="speech">Speech-to-Speech</button>
+  </div>
+
+  <div class="threshold-bar">
+    <div class="threshold-group">
+      <div class="threshold-field">
+        <label>Pass Rate &ge;</label>
+        <input type="number" id="f-pass-rate" placeholder="—" min="0" max="100" step="0.1">
+        <span class="threshold-unit">%</span>
+      </div>
+      <div class="threshold-field">
+        <label>Instruction &ge;</label>
+        <input type="number" id="f-instruction" placeholder="—" min="0" max="100" step="0.1">
+        <span class="threshold-unit">%</span>
+      </div>
+      <div class="threshold-field">
+        <label>KB Ground &ge;</label>
+        <input type="number" id="f-kb-ground" placeholder="—" min="0" max="100" step="0.1">
+        <span class="threshold-unit">%</span>
+      </div>
+    </div>
+
+    <div class="threshold-sep"></div>
+
+    <div class="threshold-group">
+      <div class="threshold-field">
+        <label>TTFB Med &le;</label>
+        <input type="number" id="f-ttfb-med" placeholder="—" min="0" step="1">
+        <span class="threshold-unit">ms</span>
+      </div>
+      <div class="threshold-field">
+        <label>TTFB P95 &le;</label>
+        <input type="number" id="f-ttfb-p95" placeholder="—" min="0" step="1">
+        <span class="threshold-unit">ms</span>
+      </div>
+      <div class="threshold-field">
+        <label>TTFB Max &le;</label>
+        <input type="number" id="f-ttfb-max" placeholder="—" min="0" step="1">
+        <span class="threshold-unit">ms</span>
+      </div>
+    </div>
+
+    <div class="threshold-actions">
+      <span class="threshold-count" id="threshold-count"></span>
+      <button class="threshold-clear" id="threshold-clear">Clear</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="leaderboard">
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="meta">
+    <div class="meta-info" id="meta-bottom"></div>
+    <div class="footnotes" id="footnotes"></div>
+  </div>
+</div>
+
+<script>
+  const FOOTNOTE_SYMS = ['†', '*', '‡', '§'];
+
+  const COLUMNS = {
+    all: [
+      { key: 'model',        label: 'Model',         type: 'string'  },
+      { key: 'type',         label: 'Type',          type: 'string'  },
+      { key: 'tool_use',     label: 'Tool Use',      type: 'frac',   pass: 'tool_use_pass',   total: 'tool_use_total'   },
+      { key: 'instruction',  label: 'Instruction',   type: 'frac',   pass: 'instruction_pass',total: 'instruction_total' },
+      { key: 'kb_ground',    label: 'KB Ground',     type: 'frac',   pass: 'kb_ground_pass',  total: 'kb_ground_total'  },
+      { key: 'pass_rate',    label: 'Pass Rate',     type: 'pct'     },
+      { key: 'latency_med',  label: 'Latency Med',   type: 'ms_adaptive', textKey: 'ttfb_med',  speechKey: 'v2v_non_tool_med' },
+      { key: 'latency_max',  label: 'Latency Max',   type: 'ms_adaptive', textKey: 'ttfb_max',  speechKey: 'v2v_non_tool_max' },
+      { key: 'ttfb_med',     label: 'TTFB Med',      type: 'ms'      },
+      { key: 'ttfb_p95',     label: 'TTFB P95',      type: 'ms'      },
+      { key: 'ttfb_max',     label: 'TTFB Max',      type: 'ms'      },
+    ],
+    text: [
+      { key: 'model',        label: 'Model',         type: 'string'  },
+      { key: 'tool_use',     label: 'Tool Use',      type: 'frac',   pass: 'tool_use_pass',   total: 'tool_use_total'   },
+      { key: 'instruction',  label: 'Instruction',   type: 'frac',   pass: 'instruction_pass',total: 'instruction_total' },
+      { key: 'kb_ground',    label: 'KB Ground',     type: 'frac',   pass: 'kb_ground_pass',  total: 'kb_ground_total'  },
+      { key: 'pass_rate',    label: 'Pass Rate',     type: 'pct'     },
+      { key: 'median_rate',  label: 'Median Rate',   type: 'pct'     },
+      { key: 'ttfb_med',     label: 'TTFB Med',      type: 'ms'      },
+      { key: 'ttfb_p95',     label: 'TTFB P95',      type: 'ms'      },
+      { key: 'ttfb_max',     label: 'TTFB Max',      type: 'ms'      },
+    ],
+    speech: [
+      { key: 'model',        label: 'Model',         type: 'string'  },
+      { key: 'tool_use',     label: 'Tool Use',      type: 'frac',   pass: 'tool_use_pass',   total: 'tool_use_total'   },
+      { key: 'instruction',  label: 'Instruction',   type: 'frac',   pass: 'instruction_pass',total: 'instruction_total' },
+      { key: 'kb_ground',    label: 'KB Ground',     type: 'frac',   pass: 'kb_ground_pass',  total: 'kb_ground_total'  },
+      { key: 'turn_ok',      label: 'Turn OK',       type: 'frac',   pass: 'turn_ok_pass',    total: 'turn_ok_total'    },
+      { key: 'pass_rate',    label: 'Pass Rate',     type: 'pct'     },
+      { key: 'v2v_non_tool_med', label: 'V2V Med',   type: 'ms'      },
+      { key: 'v2v_non_tool_max', label: 'V2V Max',   type: 'ms'      },
+      { key: 'tool_v2v_mean',    label: 'Tool V2V Mean', type: 'ms'  },
+      { key: 'silence_pad_mean', label: 'Sil. Pad Mean', type: 'ms'  },
+    ],
+  };
+
+  // Threshold filter config: [inputId, stateKey, direction, dataField]
+  const THRESHOLD_FIELDS = [
+    { id: 'f-pass-rate',   key: 'pass_rate',    dir: 'min', fn: r => r.pass_rate },
+    { id: 'f-instruction', key: 'instruction',  dir: 'min', fn: r => r.instruction_pass != null && r.instruction_total ? r.instruction_pass / r.instruction_total * 100 : null },
+    { id: 'f-kb-ground',   key: 'kb_ground',    dir: 'min', fn: r => r.kb_ground_pass  != null && r.kb_ground_total  ? r.kb_ground_pass  / r.kb_ground_total  * 100 : null },
+    { id: 'f-ttfb-med',    key: 'ttfb_med',     dir: 'max', fn: r => r.ttfb_med  },
+    { id: 'f-ttfb-p95',    key: 'ttfb_p95',     dir: 'max', fn: r => r.ttfb_p95  },
+    { id: 'f-ttfb-max',    key: 'ttfb_max',     dir: 'max', fn: r => r.ttfb_max  },
+  ];
+
+  let state = {
+    filter: 'all',
+    sortKey: 'pass_rate',
+    sortDir: -1,
+    data: null,
+    thresholds: { pass_rate: '', instruction: '', kb_ground: '', ttfb_med: '', ttfb_p95: '', ttfb_max: '' },
+  };
+
+  function getSortValue(row, col) {
+    if (col.type === 'frac') {
+      const p = row[col.pass], t = row[col.total];
+      return (p != null && t != null) ? p / t : -Infinity;
+    }
+    if (col.type === 'ms_adaptive') {
+      const k = row.type === 'speech' ? col.speechKey : col.textKey;
+      const v = row[k];
+      return v != null ? v : Infinity;
+    }
+    const v = row[col.key];
+    return v != null ? v : (col.type === 'string' ? '' : -Infinity);
+  }
+
+  function formatCell(row, col) {
+    if (col.key === 'model') {
+      const sym = row._footnote ? `<span style="color:var(--text-muted);margin-left:2px">${row._footnote}</span>` : '';
+      return `<td class="col-model">${esc(row.model)}${sym}</td>`;
+    }
+    if (col.key === 'type') {
+      const badge = row.type === 'speech'
+        ? `<span class="badge badge-speech">s2s</span>`
+        : `<span class="badge badge-text">text</span>`;
+      return `<td class="col-type">${badge}</td>`;
+    }
+    if (col.type === 'frac') {
+      const p = row[col.pass], t = row[col.total];
+      if (p == null || t == null) return `<td class="col-pass"><span class="em-dash">—</span></td>`;
+      return `<td class="col-pass"><span class="fraction">${p}/${t}</span></td>`;
+    }
+    if (col.type === 'pct') {
+      const v = row[col.key];
+      if (v == null) return `<td class="col-num"><span class="em-dash">—</span></td>`;
+      const cls = v >= 99 ? 'high' : v >= 90 ? 'mid' : 'low';
+      return `<td class="col-num"><span class="pass-rate ${cls}">${v.toFixed(1)}%</span></td>`;
+    }
+    if (col.type === 'ms') {
+      const v = row[col.key];
+      if (v == null) return `<td class="col-num"><span class="em-dash">—</span></td>`;
+      return `<td class="col-num">${v.toLocaleString()}<span style="color:var(--text-dim);font-size:10px">ms</span></td>`;
+    }
+    if (col.type === 'ms_adaptive') {
+      const k = row.type === 'speech' ? col.speechKey : col.textKey;
+      const v = row[k];
+      const tag = row.type === 'speech' ? 'v2v' : 'ttfb';
+      if (v == null) return `<td class="col-num"><span class="em-dash">—</span></td>`;
+      return `<td class="col-num">${v.toLocaleString()}<span style="color:var(--text-dim);font-size:10px">ms</span> <span style="color:var(--border);font-size:10px">${tag}</span></td>`;
+    }
+    const v = row[col.key];
+    return `<td class="col-num">${v != null ? esc(String(v)) : '<span class="em-dash">—</span>'}</td>`;
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function applyThresholds(rows) {
+    return rows.filter(row => {
+      for (const f of THRESHOLD_FIELDS) {
+        const raw = state.thresholds[f.key];
+        if (raw === '' || raw == null) continue;
+        const threshold = parseFloat(raw);
+        if (isNaN(threshold)) continue;
+        const val = f.fn(row);
+        if (val == null) return false; // no data → exclude when filter is active
+        if (f.dir === 'min' && val < threshold) return false;
+        if (f.dir === 'max' && val > threshold) return false;
+      }
+      return true;
+    });
+  }
+
+  function render() {
+    const { filter, sortKey, sortDir, data } = state;
+    const cols = COLUMNS[filter];
+
+    // Type filter
+    let rows = filter === 'all'
+      ? [...data.models]
+      : data.models.filter(m => m.type === (filter === 'text' ? 'text' : 'speech'));
+
+    const totalForFilter = rows.length;
+
+    // Threshold filters
+    rows = applyThresholds(rows);
+
+    // Count display
+    const countEl = document.getElementById('threshold-count');
+    const anyActive = THRESHOLD_FIELDS.some(f => state.thresholds[f.key] !== '');
+    countEl.innerHTML = anyActive
+      ? `<span>${rows.length}</span> / ${totalForFilter}`
+      : '';
+
+    // Footnotes (assigned before sort so symbols are stable)
+    let symIdx = 0;
+    rows.forEach(row => {
+      row._footnote = row.notes ? FOOTNOTE_SYMS[symIdx++ % FOOTNOTE_SYMS.length] : null;
+    });
+
+    // Sort
+    const sortCol = cols.find(c => c.key === sortKey) || cols.find(c => c.key === 'pass_rate') || cols[0];
+    rows.sort((a, b) => {
+      const av = getSortValue(a, sortCol);
+      const bv = getSortValue(b, sortCol);
+      if (av < bv) return sortDir;
+      if (av > bv) return -sortDir;
+      return 0;
+    });
+
+    // Header
+    const thead = document.getElementById('thead');
+    thead.innerHTML = '<tr>' + cols.map(col => {
+      const isSorted = col.key === sortKey;
+      const arrow = isSorted ? (sortDir === -1 ? '↓' : '↑') : '↕';
+      return `<th class="${isSorted ? 'sorted' : ''}" data-key="${col.key}">${esc(col.label)}<span class="sort-arrow">${arrow}</span></th>`;
+    }).join('') + '</tr>';
+
+    // Body
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = rows.length
+      ? rows.map(row => '<tr>' + cols.map(col => formatCell(row, col)).join('') + '</tr>').join('')
+      : `<tr><td colspan="${cols.length}" style="padding:24px;color:var(--text-dim);text-align:center">No models match the current filters.</td></tr>`;
+
+    // Footnotes
+    const notes = rows.filter(r => r._footnote && r.notes);
+    document.getElementById('footnotes').innerHTML = notes.map(r =>
+      `<div><span class="footnote-sym">${r._footnote}</span>${esc(r.notes)}</div>`
+    ).join('');
+
+    document.getElementById('meta-bottom').innerHTML =
+      `Last updated: <span>${esc(data.updated)}</span> &nbsp;·&nbsp; Benchmark: <span>${esc(data.benchmark)}</span>`;
+  }
+
+  function init() {
+    // Pill toggle
+    document.querySelectorAll('.pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.filter = btn.dataset.filter;
+        state.sortKey = 'pass_rate';
+        state.sortDir = -1;
+        render();
+      });
+    });
+
+    // Header sort
+    document.getElementById('thead').addEventListener('click', e => {
+      const th = e.target.closest('th');
+      if (!th) return;
+      const key = th.dataset.key;
+      if (!key) return;
+      if (state.sortKey === key) {
+        state.sortDir *= -1;
+      } else {
+        state.sortKey = key;
+        state.sortDir = -1;
+      }
+      render();
+    });
+
+    // Threshold inputs
+    THRESHOLD_FIELDS.forEach(f => {
+      const el = document.getElementById(f.id);
+      el.addEventListener('input', () => {
+        state.thresholds[f.key] = el.value;
+        el.classList.toggle('active', el.value !== '');
+        render();
+      });
+    });
+
+    // Clear button
+    document.getElementById('threshold-clear').addEventListener('click', () => {
+      THRESHOLD_FIELDS.forEach(f => {
+        state.thresholds[f.key] = '';
+        const el = document.getElementById(f.id);
+        el.value = '';
+        el.classList.remove('active');
+      });
+      render();
+    });
+
+    // Load data
+    fetch('data.json')
+      .then(r => r.json())
+      .then(data => {
+        state.data = data;
+        document.getElementById('meta-line').innerHTML =
+          `Last updated: <span>${esc(data.updated)}</span> &nbsp;·&nbsp; Benchmark: <span>${esc(data.benchmark)}</span>`;
+        render();
+      })
+      .catch(err => {
+        document.getElementById('tbody').innerHTML =
+          `<tr><td colspan="20" style="padding:24px;color:#c0392b">Failed to load data.json: ${esc(String(err))}</td></tr>`;
+      });
+  }
+
+  init();
+</script>
+</body>
+</html>
