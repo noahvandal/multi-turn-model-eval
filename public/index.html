@@ -24,6 +24,67 @@
       --yellow: #c9a84c;
       --pill-active-bg: #e8e8e8;
       --pill-active-text: #0f0f0f;
+      --badge-text-bg: #1e2a3a; --badge-text-color: #7cb3f5; --badge-text-border: #2a3f5f;
+      --badge-speech-bg: #1e3326; --badge-speech-color: #5aad7a; --badge-speech-border: #2a5040;
+    }
+
+    /* Light mode — system preference */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #f9f9f9;
+        --bg-2: #f0f0f0;
+        --bg-3: #e6e6e6;
+        --border: #d4d4d4;
+        --text: #111111;
+        --text-dim: #888888;
+        --text-muted: #666666;
+        --accent: #4878e8;
+        --accent-dim: #c0d0f8;
+        --green: #1a7a40;
+        --yellow: #8a6010;
+        --pill-active-bg: #111111;
+        --pill-active-text: #f9f9f9;
+        --badge-text-bg: #dde8ff; --badge-text-color: #2a55c0; --badge-text-border: #b0c4f0;
+        --badge-speech-bg: #d0f0e0; --badge-speech-color: #1a6b38; --badge-speech-border: #90d0b0;
+      }
+    }
+
+    /* Light mode — explicit override */
+    :root[data-theme="light"] {
+      --bg: #f9f9f9;
+      --bg-2: #f0f0f0;
+      --bg-3: #e6e6e6;
+      --border: #d4d4d4;
+      --text: #111111;
+      --text-dim: #888888;
+      --text-muted: #666666;
+      --accent: #4878e8;
+      --accent-dim: #c0d0f8;
+      --green: #1a7a40;
+      --yellow: #8a6010;
+      --pill-active-bg: #111111;
+      --pill-active-text: #f9f9f9;
+      --badge-text-bg: #dde8ff; --badge-text-color: #2a55c0; --badge-text-border: #b0c4f0;
+      --badge-speech-bg: #d0f0e0; --badge-speech-color: #1a6b38; --badge-speech-border: #90d0b0;
+    }
+
+    /* Dark mode — explicit override */
+    :root[data-theme="dark"] {
+      --bg: #0f0f0f;
+      --bg-2: #1a1a1a;
+      --bg-3: #242424;
+      --border: #2e2e2e;
+      --text: #e8e8e8;
+      --text-dim: #666;
+      --text-muted: #999;
+      --accent: #7c9ef5;
+      --accent-dim: #3a4f8a;
+      --green: #5aad7a;
+      --yellow: #c9a84c;
+      --pill-active-bg: #e8e8e8;
+      --pill-active-text: #0f0f0f;
+      --badge-text-bg: #1e2a3a; --badge-text-color: #7cb3f5; --badge-text-border: #2a3f5f;
+      --badge-speech-bg: #1e3326; --badge-speech-color: #5aad7a; --badge-speech-border: #2a5040;
     }
 
     body {
@@ -257,8 +318,8 @@
       text-transform: uppercase;
     }
 
-    .badge-text  { background: #1e2a3a; color: #7cb3f5; border: 1px solid #2a3f5f; }
-    .badge-speech { background: #1e3326; color: #5aad7a; border: 1px solid #2a5040; }
+    .badge-text  { background: var(--badge-text-bg); color: var(--badge-text-color); border: 1px solid var(--badge-text-border); }
+    .badge-speech { background: var(--badge-speech-bg); color: var(--badge-speech-color); border: 1px solid var(--badge-speech-border); }
 
     .col-num {
       color: var(--text);
@@ -308,6 +369,7 @@
     <button class="pill active" data-filter="all">All</button>
     <button class="pill" data-filter="text">Text Mode</button>
     <button class="pill" data-filter="speech">Speech-to-Speech</button>
+    <button class="pill" id="theme-toggle" style="margin-left:auto">☀ Light</button>
   </div>
 
   <div class="threshold-bar">
@@ -423,7 +485,7 @@
   let state = {
     filter: 'all',
     sortKey: 'pass_rate',
-    sortDir: -1,
+    sortDir: 1,
     data: null,
     thresholds: { pass_rate: '', instruction: '', kb_ground: '', ttfb_med: '', ttfb_p95: '', ttfb_max: '' },
   };
@@ -562,6 +624,27 @@
   }
 
   function init() {
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+
+    function effectiveTheme() {
+      const t = document.documentElement.dataset.theme;
+      if (t) return t;
+      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('theme', theme);
+      themeToggle.textContent = theme === 'dark' ? '☀ Light' : '☾ Dark';
+    }
+
+    const saved = localStorage.getItem('theme');
+    if (saved) applyTheme(saved);
+    else themeToggle.textContent = effectiveTheme() === 'dark' ? '☀ Light' : '☾ Dark';
+
+    themeToggle.addEventListener('click', () => applyTheme(effectiveTheme() === 'dark' ? 'light' : 'dark'));
+
     // Pill toggle
     document.querySelectorAll('.pill').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -569,7 +652,7 @@
         btn.classList.add('active');
         state.filter = btn.dataset.filter;
         state.sortKey = 'pass_rate';
-        state.sortDir = -1;
+        state.sortDir = 1;
         render();
       });
     });
